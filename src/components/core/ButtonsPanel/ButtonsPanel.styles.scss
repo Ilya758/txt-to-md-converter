@@ -22,7 +22,7 @@
   box-shadow: 0 0 1px 1px #7378764d;
   transition: 0.15s;
 
-  &:hover {
+  &:not(:disabled):hover {
     color: black;
 
     &::before {
@@ -43,4 +43,9 @@
     opacity: 0;
     transition: 0.15s;
   }
+}
+
+.button:disabled {
+  background-color: initial;
+  cursor: initial;
 }

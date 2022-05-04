@@ -1,9 +1,37 @@
-import React from 'react';
+import { AppContext, IAppContext } from '@src/global/context/AppContext';
+import { revertChanges } from '@src/store/actions';
+import React, { useContext } from 'react';
 import './ButtonsPanel.styles.scss';
 
 const ButtonsPanel = () => {
-  const handleClick = () => {
-    window.appAPI.openFile();
+  const {
+    state: { isEdited, textAreaValue, filePath },
+    dispatch,
+  } = useContext(AppContext) as IAppContext;
+
+  const handleNewFile = async () => {
+    window.appAPI.addNewFile(isEdited);
+  };
+
+  const handleOpenFile = () => {
+    window.appAPI.openFile(isEdited);
+  };
+
+  const handleSaveFile = () => {
+    window.appAPI.saveFile(textAreaValue);
+  };
+
+  const handleRevertChanges = () => {
+    dispatch(revertChanges());
+    window.appAPI.revertChanges();
+  };
+
+  const handleOpenInDefaultEditor = () => {
+    window.appAPI.openInDefaultEditor(filePath);
+  };
+
+  const handleShowItemInFolder = () => {
+    window.appAPI.showItemInFolder(filePath);
   };
 
   return (
@@ -11,25 +39,49 @@ const ButtonsPanel = () => {
       <div className="container buttons-panel-container">
         <div className="buttons-panel__content">
           <ul className="list buttons-panel__list">
-            <li className="item buttons-panel__item">
+            <li onClick={handleNewFile} className="item buttons-panel__item">
               <button className="button">New file</button>
             </li>
             <li className="item buttons-panel__item">
-              <button onClick={handleClick} className="button">
+              <button onClick={handleOpenFile} className="button">
                 Open file
               </button>
             </li>
             <li className="item buttons-panel__item">
-              <button className="button">Save file</button>
+              <button
+                disabled={!isEdited}
+                onClick={handleSaveFile}
+                className="button"
+              >
+                Save file
+              </button>
             </li>
             <li className="item buttons-panel__item">
-              <button className="button">Revert changes</button>
+              <button
+                onClick={handleRevertChanges}
+                disabled={!isEdited}
+                className="button"
+              >
+                Revert changes
+              </button>
             </li>
             <li className="item buttons-panel__item">
-              <button className="button">Open in default editor</button>
+              <button
+                onClick={handleOpenInDefaultEditor}
+                disabled={!filePath}
+                className="button"
+              >
+                Open in default editor
+              </button>
             </li>
             <li className="item buttons-panel__item">
-              <button className="button">Show the filepath</button>
+              <button
+                onClick={handleShowItemInFolder}
+                disabled={!filePath}
+                className="button"
+              >
+                Show the filepath
+              </button>
             </li>
           </ul>
         </div>

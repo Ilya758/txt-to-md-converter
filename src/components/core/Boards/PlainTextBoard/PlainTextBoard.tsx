@@ -1,13 +1,13 @@
 import React, { useContext, useEffect } from 'react';
 import './PlainTextBoard.styles.scss';
 import { AppContext, IAppContext } from '@src/global/context/AppContext';
-import { setData } from '@src/store/actions';
+import { addNewFile, safeFile, setData } from '@src/store/actions';
 
 const PlainTextBoard = () => {
   const {
     dispatch,
     handleTextAreaInput,
-    state: { textAreaValue },
+    state: { textAreaValue, isEdited, filePath },
   } = useContext(AppContext) as IAppContext;
 
   useEffect(() => {
@@ -16,7 +16,19 @@ const PlainTextBoard = () => {
 
       dispatch(setData({ content, filePath }));
     });
-  });
+
+    window.appAPI.onSaveFile((_, filePath: string) => {
+      dispatch(safeFile(filePath));
+    });
+
+    window.appAPI.onAddNewFile(() => {
+      dispatch(addNewFile());
+    });
+  }, [dispatch]);
+
+  useEffect(() => {
+    window.appAPI.changeContent(isEdited, filePath);
+  }, [textAreaValue, isEdited, filePath]);
 
   return (
     <div className="board plain-text-board">
