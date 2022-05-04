@@ -22,6 +22,11 @@
     "presets": [
       "@babel/env",
       "@babel/preset-react"
+    ],
+    "plugins": [
+      [
+        "@babel/transform-runtime"
+      ]
     ]
   },
   "license": "MIT",
@@ -56,13 +61,15 @@
           {
             "mainConfig": "./webpack.main.config.js",
             "renderer": {
-              "devContentSecurityPolicy": "default-src 'self' 'unsafe-inline' data:; script-src 'self' 'unsafe-eval' 'unsafe-inline' data:",
               "config": "./webpack.renderer.config.js",
               "entryPoints": [
                 {
                   "html": "./public/index.html",
                   "js": "./src/index.tsx",
-                  "name": "main_window"
+                  "name": "main_window",
+                  "preload": {
+                    "js": "./public/preload.ts"
+                  }
                 }
               ]
             }
@@ -73,6 +80,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.17.9",
+    "@babel/plugin-transform-runtime": "^7.17.10",
     "@babel/preset-env": "^7.16.11",
     "@babel/preset-react": "^7.16.7",
     "@babel/preset-typescript": "^7.16.7",
@@ -82,6 +90,7 @@
     "@electron-forge/maker-squirrel": "^6.0.0-beta.63",
     "@electron-forge/maker-zip": "^6.0.0-beta.63",
     "@electron-forge/plugin-webpack": "^6.0.0-beta.63",
+    "@types/marked": "^4.0.3",
     "@types/react": "^18.0.8",
     "@types/react-dom": "^18.0.3",
     "@typescript-eslint/eslint-plugin": "^5.21.0",
@@ -109,7 +118,9 @@
     "webpack": "^5.72.0"
   },
   "dependencies": {
+    "@babel/runtime": "^7.17.9",
     "electron-squirrel-startup": "^1.0.0",
+    "marked-react": "^1.1.0",
     "react": "^18.1.0",
     "react-dom": "^18.1.0"
   },
