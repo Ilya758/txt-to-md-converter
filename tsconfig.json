@@ -20,5 +20,5 @@
       "@src/*": ["./src/*"]
     }
   },
-  "include": ["src/**/*", "public/index.ts", "index.d.ts"]
+  "include": ["src/**/*", "index.d.ts"]
 }

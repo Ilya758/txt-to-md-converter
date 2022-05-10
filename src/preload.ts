@@ -46,3 +46,9 @@ contextBridge.exposeInMainWorld('appAPI', {
     ipcRenderer.invoke('show-filepath', filePath);
   },
 });
+
+contextBridge.exposeInMainWorld('dragAPI', {
+  onDrop: (isEdited: boolean, filePath: string) => {
+    ipcRenderer.invoke('ondrop', isEdited, filePath);
+  },
+});

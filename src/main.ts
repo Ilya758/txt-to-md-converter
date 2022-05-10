@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, dialog, shell } from 'electron';
+import { app, BrowserWindow, ipcMain, dialog, Menu, shell } from 'electron';
 
 import path from 'path';
 import { promises } from 'fs';
@@ -6,7 +6,7 @@ import { promises } from 'fs';
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 
-let mainWindow: BrowserWindow | null = null;
+let mainWindow!: BrowserWindow;
 
 if (require('electron-squirrel-startup')) {
   // eslint-disable-line global-require
@@ -20,9 +20,11 @@ const createWindow = (): void => {
     webPreferences: {
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
     },
-  });
+  }) as BrowserWindow;
 
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
+
+  Menu.setApplicationMenu(null);
 
   // mainWindow.webContents.openDevTools();
 };
@@ -51,7 +53,7 @@ const createDialog = (message: string) =>
   });
 
 const openDialog = async (isEdited: boolean) => {
-  let confirm: Electron.MessageBoxReturnValue;
+  let confirm!: Electron.MessageBoxReturnValue;
 
   if (isEdited) {
     confirm = await createDialog('Do you really want to open a file?');
@@ -84,7 +86,7 @@ const openDialog = async (isEdited: boolean) => {
 };
 
 const createNewFile = async (isEdited: boolean) => {
-  let confirm: Electron.MessageBoxReturnValue;
+  let confirm!: Electron.MessageBoxReturnValue;
 
   if (isEdited) {
     confirm = await createDialog('Do you really want to create a new file?');
@@ -94,6 +96,18 @@ const createNewFile = async (isEdited: boolean) => {
     updateUserInterface(false);
 
     mainWindow.webContents.send('file-added');
+  }
+};
+
+const dropFile = async (isEdited: boolean, filePath: string) => {
+  let confirm!: Electron.MessageBoxReturnValue;
+
+  if (isEdited) {
+    confirm = await createDialog('Do you really want to drop a new file?');
+  }
+
+  if ((isEdited && confirm.response === 0) || !isEdited) {
+    openFile(filePath);
   }
 };
 
@@ -121,7 +135,7 @@ const writeFile = async (content: string) => {
 
   if (canceled) return;
 
-  await promises.writeFile(filePath, content);
+  await promises.writeFile(filePath as string, content);
 
   mainWindow.webContents.send('file-saved', filePath);
 
@@ -135,6 +149,8 @@ const openFileInDefaultEditor = (filePath: string) => {
 const showItemInFolder = (filePath: string) => {
   shell.showItemInFolder(filePath);
 };
+
+const isExtensionValid = (ext: string) => ['.txt', '.md'].includes(ext);
 
 ipcMain.handle('open-file', (_, isEdited: boolean) => {
   openDialog(isEdited);
@@ -165,6 +181,17 @@ ipcMain.handle('open-default', (_, filePath: string) =>
 
 ipcMain.handle('show-filepath', (_, filePath: string) => {
   showItemInFolder(filePath);
+});
+
+ipcMain.handle('ondrop', (_, isEdited: boolean, filePath: string) => {
+  const extension = path.extname(filePath);
+
+  isExtensionValid(extension)
+    ? dropFile(isEdited, filePath)
+    : dialog.showErrorBox(
+        'Error',
+        'Sorry. This type of file is not supported!'
+      );
 });
 
 app.on('ready', () => {

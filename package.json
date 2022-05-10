@@ -65,10 +65,10 @@
               "entryPoints": [
                 {
                   "html": "./public/index.html",
-                  "js": "./src/index.tsx",
+                  "js": "./src/renderer.tsx",
                   "name": "main_window",
                   "preload": {
-                    "js": "./public/preload.ts"
+                    "js": "./src/preload.ts"
                   }
                 }
               ]
