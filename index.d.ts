@@ -22,8 +22,13 @@ export interface IAppAPI {
   showItemInFolder: (filePath: string) => void;
 }
 
+export interface IDragAPI {
+  onDrop: (isEdited: boolean, filePath: string) => void;
+}
+
 declare global {
   interface Window {
     appAPI: IAppAPI;
+    dragAPI: IDragAPI;
   }
 }
