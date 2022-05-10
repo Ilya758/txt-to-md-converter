@@ -6,8 +6,11 @@
 
   &__list {
     width: 100%;
-    justify-content: space-between;
-    gap: 0.2rem;
+    gap: 1rem;
+
+    @media (max-width: 800px) {
+      flex-wrap: wrap;
+    }
   }
 }
 
